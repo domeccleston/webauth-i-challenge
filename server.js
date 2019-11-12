@@ -1,7 +1,28 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const Users = require('./usersModel');  
+const session = require('express-session');
+const KnexSessionStore = require('connect-session-knex')(session);
 const server = express();
+
+const sessionConfig = {
+    name: 'notsession',
+    secret: 'before enlightenment, chop wood carry water. after enlightenment, chop wood carry water',
+    cookie: {
+        maxAge: 1000 * 60 * 60,
+        secure: false,
+        httpOnly: false,
+    },
+    resave: false,
+    saveUninitialized: false,
+    store: new KnexSessionStore({
+        knex: require('./dbconfig'),
+        tablename: 'users',
+        sidfieldname: 'sid',
+        createtable: true,
+        clearInterval: 1000 * 60 * 60,
+    })
+}
 
 server.use(express.json());
 
